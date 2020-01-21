@@ -19,8 +19,13 @@ const spacer = (text) => {
 
 spacer('findEmployeeByName Moe')
 // given a name and array of employees, return employee
+// great variable names
 const findEmployeeByName = (name, employeesArr) => {
   const returnedArr = employeesArr.filter(employee => employee.name === name)
+  // so you use filter to grab an array, but then you get only the first element and don't care about the rest
+  // what if I told you there was an array method to get ONLY the first element using a "filter-like" syntax?
+  // mind-blown
+  // take a look at the .find array method
   return returnedArr[0]
 }
 console.log(findEmployeeByName('moe', employees))//{ id: 1, name: 'moe' }
@@ -28,9 +33,10 @@ spacer('')
 
 spacer('findManagerFor Shep')
 //given an employee and a list of employees, return the employee who is the manager
+// good variable names
 const findManagerFor = (employeeObj, employeesArr) => {
   const returnedArr = employeesArr.filter(employee => employee.id === employeeObj.managerId)
-  return returnedArr[0]
+  return returnedArr[0] // same thing as above
 }
 console.log(findManagerFor(findEmployeeByName('shep Jr.', employees), employees))//{ id: 4, name: 'shep', managerId: 2 }
 spacer('')
@@ -39,6 +45,7 @@ spacer('findCoworkersFor Larry')
 
 //given an employee and a list of employees, return the employees who report to the same manager
 const findCoworkersFor = (employeeObj, employeesArr) => {
+  // what is returnedArr? what does it contain? is it a returnedArr of bananas?
   const returnedArr = employeesArr.filter(employee => employee.managerId === employeeObj.managerId &&
     employee.id !== employeeObj.id)
   return returnedArr
@@ -51,6 +58,7 @@ spacer('')
 
 spacer('findManagementChain for moe')
 //given an employee and a list of employees, return a the management chain for that employee. The management chain starts from the employee with no manager with the passed in employees manager
+// good use of default args for recursion!
 const findManagementChainForEmployee = (employeeObj, employeesArr, managers = []) => {
   if (!employeeObj.managerId) {
     return managers
@@ -79,14 +87,23 @@ const generateManagementTree = (employeesArr) => {
   //find root object
   employeesArr.forEach(employeeObj => {
     if (!employeeObj.managerId) {
+      // what if the employee obj has 300,000,000 keys?
+      // would you type out each one?
+      // there's a syntax we can use to 'copy' an object shallowly
+      // take a look at 'mdn spread operator' and try rewriting this with that if you have a chance
       treeObj.id = employeeObj.id
       treeObj.name = employeeObj.name
       treeObj.reports = []
     }
   })
 
+  // I like that you make a function to help you later
+  // good use of scope and function naming
   const isManager = (employeeID) => {
     let managerIdArr = []
+    // but everytime you call this function, you have to 'rebuild' the managerIdArr which might take
+    // a long time. imagine if you had a bunch of employees
+    // would it be possible to build the managerArr once and refer to it? we'll revisit this topic much later in the course
     employeesArr.forEach(employeeObj => {
       if (employeeObj.managerId) {
         managerIdArr.push(employeeObj.managerId)
@@ -103,7 +120,10 @@ const generateManagementTree = (employeesArr) => {
       if (!isManager(managerObj.id)) {
         return treeObj
       } else if (managerObj.id === employeeObj.managerId) {
-        employeeObj.reports = []
+        employeeObj.reports = [] // here, you are mutating the employee obj
+        // although that's ok for here, maybe we can revisit this during office hours and figure out
+        // how to make it immutable (non-mutating). we can talk about benefits and costs of doing this
+        // and why we would even bother with it at all
         managerObj.reports.push(employeeObj)
         helper(employeesArr, employeeObj)
       }
@@ -182,6 +202,10 @@ groucho
 harpo
 lucy
 */
+// I can see what you were trying to do and I think the part you're missing is how to know
+// how "deep" you are in the tree. a quick way of doing it is to have a 'depth' parameter in your helper func
+// that's set to 0 initially and increments by 1 each time you recurse. then you can use that to know
+// how many '-' you need to add!
 const displayManagementTree = (treeObj) => {
   let returnedString = ''
 
@@ -200,7 +224,9 @@ const displayManagementTree = (treeObj) => {
   return helper(treeObj)
 }
 
-displayManagementTree(generateManagementTree(employees))/*
+const s = displayManagementTree(generateManagementTree(employees))
+console.log(s)
+/*
   moe
   -larry
   --shep
